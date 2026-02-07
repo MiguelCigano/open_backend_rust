@@ -1,0 +1,71 @@
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: linear-gradient(135deg, #1e1e2f, #2c3e50);
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  transition: background-color 0.2s ease;
+}
+
+.container {
+  text-align: center;
+  background: rgb(19, 16, 207);
+  padding: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgb(255, 255, 255);
+}
+
+h1 {
+  margin-bottom: 30px;
+}
+
+/* Personaliza sliders general*/
+input[type="range"] {
+  width: 400px;              /* Ancho de la barra */
+  -webkit-appearance: none;  /* Quita estilo nativo de Chrome/Safari */
+  appearance: none;
+  --range: 0%;
+  height: 10px;
+  border-radius: 4px;
+  background: linear-gradient(
+    to right,
+    #cc08d3 0% var(--range),
+    #444 var(--range) 100%
+  );
+}
+
+/* Track (la barra) para WebKit: el fondo real lo controla el gradiente del elemento */
+input[type="range"]::-webkit-slider-runnable-track {
+  background: transparent;  /* track transparent; fill handled by element gradient */
+  height: 10px;
+  border-radius: 4px;
+}
+
+/* Thumb (el circulo que arrastras) */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;  /* clave para quitar azul */
+  appearance: none;
+  background: #f1d7d7;     /* color gris oscuro */
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  margin-top: -7px;          /* centra el thumb con la barra */
+  cursor: pointer;
+}
+
+p {
+  font-size: 25px;
+  margin-top: 20px;
+  color: rgb(244, 244, 247);
+}
+
+.color-preview {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 25px auto;
+  border-radius: 10px;
+  border: 2px solid white;
+}

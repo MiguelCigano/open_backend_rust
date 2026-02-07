@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>RGB v2 LED Control</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>RGB LED Web Controller</h1>
+
+    <div class="color-preview" id="preview"></div>
+
+    <p>R: <span id="rVal">0</span></p>
+    <input type="range" id="r" min="0" max="255" value="0">
+
+    <p>G: <span id="gVal">0</span></p>
+    <input type="range" id="g" min="0" max="255" value="0">
+
+    <p>B: <span id="bVal">0</span></p>
+    <input type="range" id="b" min="0" max="255" value="0">
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
