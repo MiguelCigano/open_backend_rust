@@ -12,6 +12,7 @@ use std::{
 };
 
 use tower_http::services::ServeDir;
+// use std::io::{BufRead, BufReader};
 
 #[derive(Clone)]
 struct AppState {
@@ -19,6 +20,8 @@ struct AppState {
     latest_rgb: Arc<Mutex<(u8, u8, u8)>>,
 }
 
+// Add to use serialport
+use::serialport::SerialPort;
 
 // Data arrive from frontend
 #[derive(Deserialize)]
@@ -40,7 +43,7 @@ async fn main() {
     let latest_rgb = Arc::new(Mutex::new((0u8, 0u8, 0u8)));
 
     // Thread send data to Arduino =================
-    let sender_port = serial.try_clone().expect("clone failed");
+    let sender_port: Box<dyn SerialPort> = serial.try_clone().expect("clone failed");
     let rgb_state = latest_rgb.clone();
 
     std::thread::spawn(move || {
@@ -65,6 +68,25 @@ async fn main() {
         }
         
     });
+
+    // Thread that read data from arduino =================
+    std::thread::spawn(move || {
+        let mut port = serial;
+        let mut buf = [0u8; 128];
+        
+        loop {
+            match port.read(&mut buf) {
+                Ok(n) if n > 0 => {
+                    let s = String::from_utf8_lossy(&buf[..n]);
+                    println!("[  READ] : Arduino says: {}", s.trim());
+                }
+                Err(ref e) if e.kind() == std::io::ErrorKind::TimedOut => {}
+                Err(e) => eprintln!("Serial read error: {:?}", e),
+                _=> {}
+            }
+        }
+    });
+
 
     // Web Server =================
     let state = AppState { latest_rgb };
