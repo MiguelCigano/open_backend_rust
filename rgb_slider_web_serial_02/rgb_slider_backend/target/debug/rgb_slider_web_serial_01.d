@@ -1,0 +1,1 @@
+/home/jm-liberty/Documents/thunder_rust/rgb_slider_web_serial_01/rgb_slider_backend/target/debug/rgb_slider_web_serial_01: /home/jm-liberty/Documents/thunder_rust/rgb_slider_web_serial_01/rgb_slider_backend/src/main.rs

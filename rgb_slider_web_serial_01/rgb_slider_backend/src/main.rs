@@ -35,14 +35,14 @@ struct RgbData {
 async fn main() {
 
     // Open serial port just one time
-    let serial = serialport::new("/dev/ttyUSB0", 9600)
+    let serial = serialport::new("/dev/ttyUSB1", 9600)
     .timeout(Duration::from_millis(10))
     .open()
     .expect("[  Fail] - No open serial port!");
 
     let latest_rgb = Arc::new(Mutex::new((0u8, 0u8, 0u8)));
 
-    // Thread send data to Arduino =================
+    // Thread send data to STM32 =================
     let sender_port: Box<dyn SerialPort> = serial.try_clone().expect("clone failed");
     let rgb_state = latest_rgb.clone();
 
@@ -61,7 +61,7 @@ async fn main() {
                 let _ = port.write_all(msg.as_bytes());
                 let _ = port.flush();
                 last_rgb_sent = current_rgb;
-                println!("[  SEND] : Sent to Arduino: {}", msg.trim());
+                println!("[  SEND] : Sent to STM32: {}", msg.trim());
             }
 
             std::thread::sleep(Duration::from_millis(30));
@@ -69,23 +69,23 @@ async fn main() {
         
     });
 
-    // Thread that read data from arduino =================
-    std::thread::spawn(move || {
-        let mut port = serial;
-        let mut buf = [0u8; 128];
+    // Thread that read data from STM32 =================
+    // std::thread::spawn(move || {
+    //     let mut port = serial;
+    //     let mut buf = [0u8; 128];
         
-        loop {
-            match port.read(&mut buf) {
-                Ok(n) if n > 0 => {
-                    let s = String::from_utf8_lossy(&buf[..n]);
-                    println!("[  READ] : Arduino says: {}", s.trim());
-                }
-                Err(ref e) if e.kind() == std::io::ErrorKind::TimedOut => {}
-                Err(e) => eprintln!("Serial read error: {:?}", e),
-                _=> {}
-            }
-        }
-    });
+    //     loop {
+    //         match port.read(&mut buf) {
+    //             Ok(n) if n > 0 => {
+    //                 let s = String::from_utf8_lossy(&buf[..n]);
+    //                 println!("[  READ] : STM32 says: {}", s.trim());
+    //             }
+    //             Err(ref e) if e.kind() == std::io::ErrorKind::TimedOut => {}
+    //             Err(e) => eprintln!("Serial read error: {:?}", e),
+    //             _=> {}
+    //         }
+    //     }
+    // });
 
 
     // Web Server =================
