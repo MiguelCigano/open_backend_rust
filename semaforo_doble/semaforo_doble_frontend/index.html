@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Control de Tráfico Rust and Arduino</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="intersection">
+        <h1 id="status-title">Control de Tráfico</h1>
+        
+        <div class="road-container">
+            <div class="traffic-box">
+                <h3>Calle A</h3>
+                <div class="traffic-light" id="semaforo1">
+                    <div class="light red" id="s1-red"></div>
+                    <div class="light yellow" id="s1-yellow"></div>
+                    <div class="light green" id="s1-green"></div>
+                </div>
+            </div>
+
+            <div class="traffic-box">
+                <h3>Calle B</h3>
+                <div class="traffic-light" id="semaforo2">
+                    <div class="light red" id="s2-red"></div>
+                    <div class="light yellow" id="s2-yellow"></div>
+                    <div class="light green" id="s2-green"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="btn-emergency" onclick="sendEmergencyStop()">PARO DE EMERGENCIA</button>
+            <div id="arduino-btn-status">Boton State: <span>OK</span></div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

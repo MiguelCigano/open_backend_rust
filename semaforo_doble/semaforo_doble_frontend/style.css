@@ -1,0 +1,67 @@
+body {
+    background-color: #1b2d3e;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 10;
+}
+
+.intersection {
+    text-align: center;
+    background: #34495e;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgb(255, 255, 255);
+}
+
+.road-container {
+    display: flex;
+    gap: 80px;
+    justify-content: center;
+    margin: 40px 0;
+}
+
+.traffic-light {
+    background: #042d10;
+    width: 80px;
+    padding: 15px;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.light {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #444; /* Apagado */
+    transition: 0.3s;
+    margin: 0 auto;
+}
+
+/* Colores cuando están encendidos */
+.light.red.active { background: #ff4757; box-shadow: 0 0 20px #ff4757; }
+.light.yellow.active { background: #e7e407; box-shadow: 0 0 20px #ffffff; }
+.light.green.active { background: #2ed573; box-shadow: 0 0 20px #2ed573; }
+
+#btn-emergency {
+    background: #ee1f08;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: 0.3s;
+}
+
+#btn-emergency:hover { background: #ee1f08; }
+
+#arduino-btn-status {
+    margin-top: 20px;
+    font-weight: bold;
+}
