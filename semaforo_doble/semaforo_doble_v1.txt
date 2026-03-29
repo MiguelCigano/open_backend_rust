@@ -1,0 +1,201 @@
+typedef uint8_t ui8;
+
+constexpr int button_pin      = 2;
+constexpr int normal_interval = 3000;
+constexpr int ambar_interval  = 1000; 
+
+unsigned long time            = 0;
+static bool web_stop          = false;
+
+ui8 count_times_stop          = 0;
+ui8 count_times_button_stop   = 0;
+
+enum class ButtonStates : volatile ui8 {
+  STOP,    // is 0
+  RUN      // is 1
+};
+
+ButtonStates button_state = ButtonStates::STOP;
+
+struct TrafficLight {
+  ui8 RED;
+  const char* red;
+
+  ui8 YELLOW;
+  const char* yellow;
+
+  ui8 GREEN;
+  const char* green;
+};
+
+const char* get_button_state() {
+
+  ButtonStates local_button_state = button_state;
+  
+  return (local_button_state == ButtonStates::RUN) 
+  ? "RUN"
+  : "STOP";
+}
+
+const char* get_active_light(const TrafficLight &tl) {
+  if (tl.RED) {
+    return tl.red;
+  }
+  else if (tl.GREEN) {
+    return tl.green;
+  }
+  else if (tl.YELLOW) {
+    return tl.yellow;
+  }
+  else {
+    return "unknown"; // just to debug errors
+  }
+}
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(button_pin, INPUT);
+  attachInterrupt(digitalPinToInterrupt(button_pin), change_button_state, RISING);
+  time = millis();
+}
+
+TrafficLight tl01 = {1, "red", 0, "yellow", 0, "green"};
+TrafficLight tl02 = {0, "red", 0, "yellow", 1, "green"};
+
+void send_string_rust() {
+  // Correct way to use with Backend:
+  Serial.print(get_active_light(tl01));
+  Serial.print(",");
+  Serial.print(get_active_light(tl02));
+  Serial.print(",");
+  Serial.println(get_button_state());
+}
+
+void loop() {
+  // S1: rojo a rojo  S2: verde a amarillo
+  if ((millis() - time > normal_interval && tl01.RED && tl02.GREEN) && (!web_stop)) {
+    tl01.RED    = 1;
+    tl01.YELLOW = 0;
+    tl01.GREEN  = 0;
+
+    tl02.RED    = 0;
+    tl02.YELLOW = 1;
+    tl02.GREEN  = 0;
+
+    // Jus for test on arduino serial monitor
+    // Serial.println("");
+    // Serial.println("S1: red");
+    // Serial.println("S2: yellow");
+    
+    send_string_rust();
+
+    time = millis();
+  }
+  // S1: rojo a verde  S2: amarillo a rojo
+  else if ((millis() - time > ambar_interval && tl01.RED && tl02.YELLOW) && (!web_stop)) {
+    tl01.RED    = 0;
+    tl01.YELLOW = 0;
+    tl01.GREEN  = 1;
+
+    tl02.RED    = 1;
+    tl02.YELLOW = 0;
+    tl02.GREEN  = 0;
+
+    send_string_rust();
+
+    time = millis();
+  }
+  // S1: verde a amarillo  S2: rojo a rojo
+  else if ((millis() - time > normal_interval && tl01.GREEN && tl02.RED) && (!web_stop)) {
+    tl01.RED    = 0;
+    tl01.YELLOW = 1;
+    tl01.GREEN  = 0;
+
+    tl02.RED    = 1;
+    tl02.YELLOW = 0;
+    tl02.GREEN  = 0;
+
+    send_string_rust();
+
+    time = millis();
+  }
+  // S1: amarillo a rojo  S2: rojo a verde
+  else if ((millis() - time > ambar_interval && tl01.YELLOW && tl02.RED) && (!web_stop)) {
+    tl01.RED    = 1;
+    tl01.YELLOW = 0;
+    tl01.GREEN  = 0;
+
+    tl02.RED    = 0;
+    tl02.YELLOW = 0;
+    tl02.GREEN  = 1;
+
+    send_string_rust();
+
+    time = millis();
+  }
+  else if (web_stop) {
+    tl01.RED    = 1;
+    tl01.YELLOW = 0;
+    tl01.GREEN  = 0;
+
+    tl02.RED    = 1;
+    tl02.YELLOW = 0;
+    tl02.GREEN  = 0;
+
+    send_string_rust();
+
+    web_stop = false;
+  }
+  
+  if ((button_state == ButtonStates::STOP) && (count_times_button_stop == 0)) {
+    if (count_times_stop == 0) {
+      tl01.RED    = 1;
+      tl01.YELLOW = 0;
+      tl01.GREEN  = 0;
+
+      tl02.RED    = 1;
+      tl02.YELLOW = 0;
+      tl02.GREEN  = 0;
+
+      count_times_button_stop++;
+
+      send_string_rust();
+    }
+  }
+  else if ((button_state == ButtonStates::RUN) && (count_times_button_stop == 1)) {
+    tl01.RED    = 1;
+
+    tl02.RED    = 0;
+    tl02.GREEN  = 1;
+
+    count_times_button_stop = 0;
+  }
+  
+  if (Serial.available()) {
+    String cmd = Serial.readStringUntil('\n');
+    
+    Serial.println(cmd);
+    if (cmd == "STOP" && (count_times_stop == 0)) {
+      web_stop = true;
+      count_times_stop++;
+    }
+    else {
+      web_stop = false;
+      count_times_stop = 0;
+
+      tl01.RED    = 1;
+
+      tl02.RED    = 0;
+      tl02.GREEN  = 1;
+    }
+  }
+
+}
+
+void change_button_state() {
+  button_state = 
+    (button_state == ButtonStates::STOP)
+    ? button_state = ButtonStates::RUN
+    : button_state = ButtonStates::STOP;
+}
+

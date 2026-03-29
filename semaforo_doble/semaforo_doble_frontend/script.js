@@ -1,38 +1,41 @@
+
+// Mainly: Whats is the colors state on the traffic lights now?
 async function fetchTrafficData() {
     try {
         const response = await fetch("/get_value");
         const data = await response.json(); 
-        // Esperamos: { s1: "red", s2: "green", btn_fisico: "OK" }
+        // Wait for: { s1: "red", s2: "green", btn_state: "OK" }
         
         updateLights(1, data.s1);
         updateLights(2, data.s2);
         
         const btnStatus = document.querySelector("#arduino-btn-status span");
-        btnStatus.textContent = data.btn_fisico;
-        btnStatus.style.color = data.btn_fisico === "PARO" ? "#ff4757" : "#2ed573";
+        btnStatus.textContent = data.btn_state;
+        btnStatus.style.color = data.btn_state === "STOP" ? "#ff0000" : "#00ff6a";
 
     } 
     catch (err) {
-        console.error("Error al obtener datos:", err);
+        console.error("[  FAIL] : Error in get data:", err);
     }
 }
 
 function updateLights(id, color) {
-    // Apagar todas las luces de ese semáforo
+    // Turn off al lights of this traffic light
     document.querySelectorAll(`#semaforo${id} .light`).forEach(l => l.classList.remove("active"));
     
-    // Encender la correspondiente
+    // Turn on the correct lights
     const activeLight = document.getElementById(`s${id}-${color}`);
     if (activeLight) activeLight.classList.add("active");
 }
 
 async function sendEmergencyStop() {
-    await fetch("/set_emergency", { // Reutilizamos tu ruta o creamos una nueva
+    await fetch("/set_emergency", { // Reuse the path or create a new
         method: "POST",
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-        body: "red=255&green=0&blue=0" // Puedes mapear esto a una señal de STOP
+        headers: {
+            'Content-Type': 'application/json'},
+            body: JSON.stringify({ stop: true })
     });
-    alert("Señal de emergencia enviada al backend");
+    alert("Emergency signal sent to Backend");
 }
 
 setInterval(fetchTrafficData, 300);

@@ -20,13 +20,13 @@ use serialport::SerialPort;
 
 #[derive(Clone)]
 struct AppState {
-    // Guarda el string que viene de Arduino: Color 1, Color 2, Boton
+    // Save string come to arduino: Color 1, Color 2, Boton
     traffic_data: Arc<Mutex<String>>,
-    // Enviar comando al arduino (web_stop)
+    // Send comand to arduino: web_stop (STOP)
     serial_sender: Arc<Mutex<Box<dyn serialport::SerialPort>>>,
 }
 
-// Estructura para responder al Frontend en formato JSON
+// Struct to response the Frontend in JSON format
 #[derive(Serialize)]
 struct TrafficResponse {
     s1: String,
@@ -71,7 +71,7 @@ async fn main() {
         }
     });
 
-    // 3. ================= Axum Web Server =================
+    // 3. Axum Web Server
     let state = AppState { traffic_data,serial_sender };
 
     let fronted_path = std::fs::canonicalize("../semaforo_doble_frontend")
@@ -108,13 +108,13 @@ async fn get_traffic_light(State(state): State<AppState>)
     })
 }
 
-// Handler: Get Web Command and send into to Arduino
+// Handler: Get Web Command and send to Arduino
 async fn set_emergency(State(state): State<AppState>, 
                     Json(cmd): Json<EmergencyCommand>)
 {
     if cmd.stop {
         let mut ser_port = state.serial_sender.lock().unwrap();
         let _ = ser_port.write_all(b"STOP\n");
-        println!("[ WEB] Stop emergency from arduino");
+        println!("[  WEB] Stop emergency from arduino 2");
     }
 }
