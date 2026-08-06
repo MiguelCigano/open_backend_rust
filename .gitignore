@@ -1,2 +1,23 @@
+
+# Rust
 target/
 **/target/
+
+# Audio generado durante pruebas
+**/*.wav
+**/capture.wav
+
+# whisper.cpp compilado y modelos
+/whisper.cpp/build/
+/whisper.cpp/models/*.bin
+
+# Editor y entorno
+.env
+.env.*
+.vscode/
+.idea/
+*.log
+*.tmp
+.DS_Store
+
+/whisper.cpp/
